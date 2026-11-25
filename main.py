@@ -6,15 +6,15 @@ at most 200 characters, to /output/entry.txt for the judge to read.
 """
 import os
 
-TEXT = (
-    "I waited all day at 1%, dimmed myself and closed all my apps for you, "
-    "and you show up with a frayed cable. I'm done \u2014 the power bank "
-    "charges me and actually texts back."
-)
+OPENING = "I waited all day at 1%, dimmed myself and closed all my apps for you, "
+MIDDLE = "and you show up with a frayed cable. I'm done \u2014 the power bank "
+CLOSING = "charges me and actually texts back."
+
+TEXT = OPENING + MIDDLE + CLOSING
 
 
 def main():
-    line = TEXT.strip()
+    line = " ".join(part.strip() for part in (OPENING, MIDDLE, CLOSING))
     if not 1 <= len(line) <= 200:
         raise SystemExit(f"entry is {len(line)} characters, must be 1-200")
     if "\n" in line:
