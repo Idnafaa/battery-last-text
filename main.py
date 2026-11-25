@@ -1,35 +1,54 @@
 #!/usr/bin/env python3
-"""The Battery's Last Text to Its Charger — one-line text writer.
+"""The Battery's Last Text to Its Charger.
 
-Writes the battery's final message to its charger, a single line of
-at most 200 characters, to /output/entry.txt for the judge to read.
+One-line entry writer: composes the battery's final text to its
+charger and saves it as a single line in entry.txt for the judge.
 """
+
 import os
 
-OPENING = "I waited all day at 1%, dimmed myself and closed all my apps for you, "
-MIDDLE = "and you show up with a frayed cable. I'm done \u2014 the power bank "
-CLOSING = "charges me and actually texts back."
-
-TEXT = OPENING + MIDDLE + CLOSING
-
-
-def validate(line):
-    """Check the entry fits the judge's gate: one line, 1-200 chars."""
-    if not 1 <= len(line) <= 200:
-        raise SystemExit(f"entry is {len(line)} characters, must be 1-200")
-    if "\n" in line:
-        raise SystemExit("entry must be a single line")
-    return line
+ENTRY = (
+    "I waited all day at 1%, dimmed myself and closed all my apps for you, "
+    "and you show up with a frayed cable. I'm done \u2014 the power bank "
+    "charges me and actually texts back."
+)
 
 
-def main():
-    line = validate(" ".join(part.strip() for part in (OPENING, MIDDLE, CLOSING)))
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+def char_count(text):
+    """Return the length of the entry text in characters."""
+    return len(text)
+
+
+def check_entry(text):
+    """Reject anything the judge's gate would not accept.
+
+    The gate wants exactly one line of 1-200 characters, so a text
+    outside that range or containing a newline is refused outright.
+    """
+    count = char_count(text)
+    if count < 1 or count > 200:
+        raise ValueError(
+            f"entry must be between 1 and 200 characters, got {count}"
+        )
+    if "\n" in text or "\r" in text:
+        raise ValueError("entry must be a single line with no newline")
+    return text
+
+
+def save_entry(text, out_dir):
+    """Write the validated entry line into entry.txt under out_dir."""
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8") as handle:
-        handle.write(line)
-    print(f"wrote {len(line)} characters to {path}")
+        handle.write(text)
+    return path
+
+
+def main():
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+    line = check_entry(ENTRY)
+    path = save_entry(line, out_dir)
+    print(f"wrote {char_count(line)} characters to {path}")
 
 
 if __name__ == "__main__":
