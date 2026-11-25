@@ -13,12 +13,17 @@ CLOSING = "charges me and actually texts back."
 TEXT = OPENING + MIDDLE + CLOSING
 
 
-def main():
-    line = " ".join(part.strip() for part in (OPENING, MIDDLE, CLOSING))
+def validate(line):
+    """Check the entry fits the judge's gate: one line, 1-200 chars."""
     if not 1 <= len(line) <= 200:
         raise SystemExit(f"entry is {len(line)} characters, must be 1-200")
     if "\n" in line:
         raise SystemExit("entry must be a single line")
+    return line
+
+
+def main():
+    line = validate(" ".join(part.strip() for part in (OPENING, MIDDLE, CLOSING)))
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
